@@ -1,4 +1,5 @@
 *.pyc
 # Ignore Visual Studio Code settings
 .vscode/*
-
+# Ignore generated documentation
+doc/*
