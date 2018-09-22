@@ -2,8 +2,8 @@
 Changelog for package leap_motion
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.13 (2018-09-22)
+-------------------
 * Reimplementation of the entire Leap Motion driver for ROS
 * Old implementation of the driver is now deprecated and will be removed in a year.
 * Contributors: Isaac I.Y. Saito, nowittyusername
