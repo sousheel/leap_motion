@@ -2,12 +2,9 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b my_package is ... In addition to providing an overview of your package,
-this is the section where the specification and design/architecture 
-should be detailed. While the original specification may be done on the
-wiki, it should be transferred here once your package starts to take shape.
-You can then link to this documentation page from the Wiki.
-
+\b leap_motion is a ROS wrapper for interfacing with the Leap Motion 3D gesture sensor API
+(https://www.leapmotion.com/). For the most up to date information you can check our Github
+repository at https://github.com/ros-drivers/leap_motion
 
 \section codeapi Code API
 
@@ -86,14 +83,37 @@ Sets the following parameters on the parameter server
 
 \section commandline Command-line tools
 
-This section is a catch-all for any additional tools that your package
-provides or uses that may be of use to the reader. For example:
+\subsection script_name demo.launch
 
-- tools/scripts (e.g. rospack, roscd)
-- roslaunch .launch files
-- xmlparam files
+Description of what this script/file does.
 
-\subsection script_name script_name
+\subsubsection Usage
+\verbatim
+$ ./script_name [args]
+\endverbatim
+
+\par Example
+
+\verbatim
+$ ./script_name foo bar
+\endverbatim
+
+\subsection script_name camera.launch
+
+Description of what this script/file does.
+
+\subsubsection Usage
+\verbatim
+$ ./script_name [args]
+\endverbatim
+
+\par Example
+
+\verbatim
+$ ./script_name foo bar
+\endverbatim
+
+\subsection script_name visualization.launch
 
 Description of what this script/file does.
 
