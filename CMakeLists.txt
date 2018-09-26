@@ -83,7 +83,6 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/LeapSDK/include/
-  ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x64/
 )
 
 ## Declare a C++ library
@@ -97,6 +96,18 @@ target_link_libraries(lmc_listener
   ${catkin_LIBRARIES}
   ${PROJECT_SOURCE_DIR}/LeapSDK/include/Leap.h
 )
+
+# Check system architecture (32-bit, 64-bit etc)
+# Probably a VERY NAIVE way of doing this
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "64")
+  set(LIB_LEAP ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x64/libLeap.so)
+  message(STATUS "Using a 64-bit libLeap.so")
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+  message(FATAL_ERROR "Leap Motion doesn't run on arm")
+else()
+  set(LIB_LEAP ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x86/libLeap.so)
+  message(STATUS "Using a 32-bit libLeap.so")
+endif()
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -113,7 +124,7 @@ add_dependencies( ${PROJECT_NAME}_driver_node
 target_link_libraries(${PROJECT_NAME}_driver_node
   ${catkin_LIBRARIES}
   lmc_listener
-  ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x64/libLeap.so
+  ${LIB_LEAP}
 )
 
 # Node that visualizes the data it gets from the controller
@@ -126,7 +137,7 @@ add_dependencies(${PROJECT_NAME}_visualizer_node
 )
 target_link_libraries(${PROJECT_NAME}_visualizer_node  
   ${catkin_LIBRARIES}
-  ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x64/libLeap.so
+  ${LIB_LEAP}
 )
 
 # Node that publishes raw camera images. Be sure to 
@@ -136,7 +147,7 @@ add_executable(${PROJECT_NAME}_camera_node
 )
 target_link_libraries(${PROJECT_NAME}_camera_node
   ${catkin_LIBRARIES} 
-  ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x64/libLeap.so
+  ${LIB_LEAP}
 )
 
 # Filter node implementing a 2nd-order Butterworth lowpass filter
@@ -149,7 +160,7 @@ add_dependencies(${PROJECT_NAME}_filter_node
 )
 target_link_libraries(${PROJECT_NAME}_filter_node
   ${catkin_LIBRARIES} 
-  ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x64/libLeap.so
+  ${LIB_LEAP}
 )
 
 #########################################################
@@ -161,12 +172,12 @@ add_executable(leap_hands
   src/leap_hands.cpp
 )
 target_link_libraries(leap_hands
-  ${catkin_LIBRARIES} ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x64/libLeap.so
+  ${catkin_LIBRARIES} ${LIB_LEAP}
 )
 
 add_executable(leap_camera src/leap_camera.cpp)
 target_link_libraries(leap_camera
-  ${catkin_LIBRARIES} ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x64/libLeap.so
+  ${catkin_LIBRARIES} ${LIB_LEAP}
 )
 
 install(TARGETS leap_camera leap_hands
