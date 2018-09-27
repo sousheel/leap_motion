@@ -8,8 +8,8 @@ Changelog for package leap_motion
 * Old implementation of the driver is now deprecated and will be removed in a year.
 * Contributors: Nowittyusername
 
-Forthcoming
------------
+0.0.14 (2018-09-27)
+-------------------
 * Drop indigo testing from CI as it has reached EOL
 * CMake now chooses the appropriate *.so depending on the system
 * Contributors: nowittyusername
