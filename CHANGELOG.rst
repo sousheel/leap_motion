@@ -8,6 +8,12 @@ Changelog for package leap_motion
 * Old implementation of the driver is now deprecated and will be removed in a year.
 * Contributors: Nowittyusername
 
+Forthcoming
+-----------
+* Drop indigo testing from CI as it has reached EOL
+* CMake now chooses the appropriate *.so depending on the system
+* Contributors: nowittyusername
+
 0.0.13 (2018-09-25)
 -------------------
 * Reimplementation of the entire Leap Motion driver for ROS
