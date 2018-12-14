@@ -76,6 +76,8 @@ class LeapInterface(Leap.Listener):
         self.hand_roll      = 0.0
         self.circle_progress = 0
         self.fingerNames = ['thumb', 'index', 'middle', 'ring', 'pinky']
+        self.arm_trans = Leap.Matrix.identity
+        self.arm_trans_np, rrr = np.linalg.qr(np.array(self.arm_trans.to_array_3x3()).reshape((3,3)))
         for fingerName in self.fingerNames:
             setattr(self, fingerName, LeapFinger())
         print "Initialized Leap Motion Device"
@@ -167,11 +169,11 @@ class LeapInterface(Leap.Listener):
             z_basis = basis.z_basis
             center = arm.elbow_position + (arm.wrist_position - arm.elbow_position) * .05
 
-            arm_transform = Leap.Matrix(x_basis, y_basis, z_basis, center)
-            arm_trans_np, rrr = np.linalg.qr(np.array(arm_transform.to_array_3x3()).reshape((3,3)))
+            self.arm_trans = Leap.Matrix(x_basis, y_basis, z_basis, center)
+            self.arm_trans_np, rrr = np.linalg.qr(np.array(self.arm_trans.to_array_3x3()).reshape((3,3)))
             # print(arm_trans_np)
-            my_quat = Quaternion(matrix=arm_trans_np)
-            
+            # my_quat = Quaternion(matrix=arm_trans_np)
+
             # circle = CircleGesture(gesture)
             # self.circle_progress = 0
             # self.circle_progress = circle.progress
@@ -267,6 +269,9 @@ class LeapInterface(Leap.Listener):
     def getCircleProgress(self):
         return self.circle_progress
 
+    def getArmTransform(self):
+        return self.arm_trans_np
+
 
 class Runner(threading.Thread):
 
@@ -303,6 +308,9 @@ class Runner(threading.Thread):
 
     def get_circle_progress(self):
         return self.listener.getCircleProgress()
+
+    def get_arm_transform(self):
+        return self.listener.getArmTransform()
 
     def run (self):
         while True:

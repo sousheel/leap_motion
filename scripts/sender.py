@@ -12,6 +12,8 @@ import leap_interface
 from leap_motion.msg import leap
 from leap_motion.msg import leapros
 from std_msgs.msg import Float64
+import numpy as np
+from pyquaternion import Quaternion
 
 FREQUENCY_ROSTOPIC_DEFAULT = 0.01
 NODENAME = 'leap_pub'
@@ -42,6 +44,7 @@ def sender():
 
         circle_progress   = li.get_circle_progress()
         # print(circle_progress)
+        arm_trans = li.get_arm_transform()
 
         msg = leapros()
         msg.direction.x = hand_direction_[0]
@@ -70,7 +73,11 @@ def sender():
         # We don't publish native data types, see ROS best practices
         pub.publish(hand_direction=hand_direction_,hand_normal = hand_normal_, hand_palm_pos = hand_palm_pos_, hand_pitch = hand_pitch_, hand_roll = hand_roll_, hand_yaw = hand_yaw_)
         pub_ros.publish(msg)
-        # pub_circle.publish(Float64(circle_progress))
+        pub_circle.publish(Float64(circle_progress))
+        my_quat = Quaternion(matrix=arm_trans)
+        # print(my_quat)
+
+
         rospy.sleep(rospy.get_param(PARAMNAME_FREQ_ENTIRE, FREQUENCY_ROSTOPIC_DEFAULT))
 
 
