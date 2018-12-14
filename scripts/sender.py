@@ -11,6 +11,7 @@ import rospy
 import leap_interface
 from leap_motion.msg import leap
 from leap_motion.msg import leapros
+from std_msgs.msg import Float64
 
 FREQUENCY_ROSTOPIC_DEFAULT = 0.01
 NODENAME = 'leap_pub'
@@ -26,8 +27,9 @@ def sender():
     li = leap_interface.Runner()
     li.setDaemon(True)
     li.start()
-    # pub     = rospy.Publisher('leapmotion/raw',leap)
+    pub     = rospy.Publisher('leapmotion/raw',leap)
     pub_ros   = rospy.Publisher('leapmotion/data',leapros, queue_size=2)
+    pub_circle = rospy.Publisher('leapmotion/circle', Float64)
     rospy.init_node(NODENAME)
 
     while not rospy.is_shutdown():
@@ -37,6 +39,9 @@ def sender():
         hand_pitch_       = li.get_hand_pitch()
         hand_roll_        = li.get_hand_roll()
         hand_yaw_         = li.get_hand_yaw()
+
+        circle_progress   = li.get_circle_progress()
+        # print(circle_progress)
 
         msg = leapros()
         msg.direction.x = hand_direction_[0]
@@ -63,8 +68,9 @@ def sender():
                             dimName, pos[iDim])
 
         # We don't publish native data types, see ROS best practices
-        # pub.publish(hand_direction=hand_direction_,hand_normal = hand_normal_, hand_palm_pos = hand_palm_pos_, hand_pitch = hand_pitch_, hand_roll = hand_roll_, hand_yaw = hand_yaw_)
+        pub.publish(hand_direction=hand_direction_,hand_normal = hand_normal_, hand_palm_pos = hand_palm_pos_, hand_pitch = hand_pitch_, hand_roll = hand_roll_, hand_yaw = hand_yaw_)
         pub_ros.publish(msg)
+        # pub_circle.publish(Float64(circle_progress))
         rospy.sleep(rospy.get_param(PARAMNAME_FREQ_ENTIRE, FREQUENCY_ROSTOPIC_DEFAULT))
 
 

@@ -25,11 +25,13 @@ import time
 
 # Below, you can see the "dirty" version - NOT RECOMMENDED!
 
-# sys.path.append("/home/YOUR_NAME/path/to/Leap_Developer/LeapSDK/lib")
-# sys.path.append("/home/YOUR_NAME/path/to/Leap_Developer/Leap_Developer/LeapSDK/lib/x64")
+sys.path.append("/home/tetsuo/catkin_ws/src/leap_motion/LeapSDK/lib")
+sys.path.append("/home/tetsuo/catkin_ws/src/leap_motion/LeapSDK/lib/x64")
 import threading
 import Leap
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
+from pyquaternion import Quaternion
+import numpy as np
 
 class LeapFinger():
     def __init__(self, finger=None):
@@ -72,6 +74,7 @@ class LeapInterface(Leap.Listener):
         self.hand_pitch     = 0.0
         self.hand_yaw       = 0.0
         self.hand_roll      = 0.0
+        self.circle_progress = 0
         self.fingerNames = ['thumb', 'index', 'middle', 'ring', 'pinky']
         for fingerName in self.fingerNames:
             setattr(self, fingerName, LeapFinger())
@@ -156,10 +159,27 @@ class LeapInterface(Leap.Listener):
             self.hand_yaw          = normal.yaw * Leap.RAD_TO_DEG
             self.hand_roll         = direction.roll * Leap.RAD_TO_DEG
 
+            # Get Arm Data
+            arm = self.hand.arm
+            basis = arm.basis
+            x_basis = basis.x_basis
+            y_basis = basis.y_basis
+            z_basis = basis.z_basis
+            center = arm.elbow_position + (arm.wrist_position - arm.elbow_position) * .05
+
+            arm_transform = Leap.Matrix(x_basis, y_basis, z_basis, center)
+            arm_trans_np, rrr = np.linalg.qr(np.array(arm_transform.to_array_3x3()).reshape((3,3)))
+            # print(arm_trans_np)
+            my_quat = Quaternion(matrix=arm_trans_np)
+            
+            # circle = CircleGesture(gesture)
+            # self.circle_progress = 0
+            # self.circle_progress = circle.progress
+
             # Calculate the hand's pitch, roll, and yaw angles
             print "Hand pitch: %f degrees, roll: %f degrees, yaw: %f degrees" % (self.hand_pitch, self.hand_roll, self.hand_yaw)
 
-            '''
+
             # Gestures
             for gesture in frame.gestures():
                 if gesture.type == Leap.Gesture.TYPE_CIRCLE:
@@ -168,8 +188,10 @@ class LeapInterface(Leap.Listener):
                     # Determine clock direction using the angle between the pointable and the circle normal
                     if circle.pointable.direction.angle_to(circle.normal) <= Leap.PI/4:
                         clockwiseness = "clockwise"
+                        self.circle_progress = circle.progress
                     else:
                         clockwiseness = "counterclockwise"
+                        self.circle_progress = circle.progress * -1
 
                     # Calculate the angle swept since the last frame
                     swept_angle = 0
@@ -181,11 +203,13 @@ class LeapInterface(Leap.Listener):
                             gesture.id, self.state_string(gesture.state),
                             circle.progress, circle.radius, swept_angle * Leap.RAD_TO_DEG, clockwiseness)
 
+
+
                 if gesture.type == Leap.Gesture.TYPE_SWIPE:
                     swipe = SwipeGesture(gesture)
                     print "Swipe id: %d, state: %s, position: %s, direction: %s, speed: %f" % (
                             gesture.id, self.state_string(gesture.state),
-                            swipe.position, swipe.direction, swipe.speed)
+                            swipe.position, swipe.directionsta, swipe.speed)
 
                 if gesture.type == Leap.Gesture.TYPE_KEY_TAP:
                     keytap = KeyTapGesture(gesture)
@@ -199,8 +223,11 @@ class LeapInterface(Leap.Listener):
                             gesture.id, self.state_string(gesture.state),
                             screentap.position, screentap.direction )
 
-        if not (frame.hands.empty and frame.gestures().empty):
-            print ""
+                if gesture.state == Leap.Gesture.STATE_STOP:
+                    self.circle_progress = 0
+
+        # if not (frame.hands.empty and frame.gestures.empty):
+        #     print ""
 
     def state_string(self, state):
         if state == Leap.Gesture.STATE_START:
@@ -214,7 +241,7 @@ class LeapInterface(Leap.Listener):
 
         if state == Leap.Gesture.STATE_INVALID:
             return "STATE_INVALID"
-    '''
+
 
     def get_hand_direction(self):
         return self.hand_direction
@@ -236,6 +263,9 @@ class LeapInterface(Leap.Listener):
 
     def get_finger_point(self, fingerName, fingerPointName):
         return getattr(getattr(self, fingerName), fingerPointName)
+
+    def getCircleProgress(self):
+        return self.circle_progress
 
 
 class Runner(threading.Thread):
@@ -271,8 +301,10 @@ class Runner(threading.Thread):
     def get_finger_point(self, fingerName, fingerPointName):
         return self.listener.get_finger_point(fingerName, fingerPointName)
 
+    def get_circle_progress(self):
+        return self.listener.getCircleProgress()
+
     def run (self):
         while True:
             # Save some CPU time
             time.sleep(0.001)
-
