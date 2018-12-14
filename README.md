@@ -6,7 +6,7 @@ ROS driver for the Leap Motion Controller
 
 ## REQUIREMENTS
 
-You should have [ROS Kinetic](http://wiki.ros.org/kinetic) or a [newer version](http://wiki.ros.org/Distributions) installed on your device and the [Leap Motion SDK](https://developer.leapmotion.com/sdk/v2) for Linux.
+You should have [ROS Kinetic](http://wiki.ros.org/kinetic) or a [newer version](http://wiki.ros.org/Distributions) installed on your device and the [Leap Motion SDK](https://developer.leapmotion.com/sdk/v2) for Linux. For FAQ on Linux installation, see [this site](https://support.leapmotion.com/hc/en-us/articles/223782608-Linux-Installation)
 
 ## FEATURES
 
