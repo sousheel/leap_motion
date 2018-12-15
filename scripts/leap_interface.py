@@ -32,6 +32,7 @@ import Leap
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from pyquaternion import Quaternion
 import numpy as np
+from scipy.linalg import orth
 
 class LeapFinger():
     def __init__(self, finger=None):
@@ -77,7 +78,8 @@ class LeapInterface(Leap.Listener):
         self.circle_progress = 0
         self.fingerNames = ['thumb', 'index', 'middle', 'ring', 'pinky']
         self.arm_trans = Leap.Matrix.identity
-        self.arm_trans_np, rrr = np.linalg.qr(np.array(self.arm_trans.to_array_3x3()).reshape((3,3)))
+        self.arm_trans_np = orth(np.array(self.arm_trans.to_array_3x3()).reshape((3,3)))
+        print self.arm_trans_np
         for fingerName in self.fingerNames:
             setattr(self, fingerName, LeapFinger())
         print "Initialized Leap Motion Device"
@@ -170,7 +172,7 @@ class LeapInterface(Leap.Listener):
             center = arm.elbow_position + (arm.wrist_position - arm.elbow_position) * .05
 
             self.arm_trans = Leap.Matrix(x_basis, y_basis, z_basis, center)
-            self.arm_trans_np, rrr = np.linalg.qr(np.array(self.arm_trans.to_array_3x3()).reshape((3,3)))
+            self.arm_trans_np = orth(np.array(self.arm_trans.to_array_3x3()).reshape((3,3)))
             # print(arm_trans_np)
             # my_quat = Quaternion(matrix=arm_trans_np)
 
